@@ -5,11 +5,11 @@ import (
 	"log"
 	"strings"
 )
-type TREE struct {
+type BST struct {
 	Root *Node
 }
 
-func NewMorseTree() (*TREE, error) {
+func NewMorseTree() (*BST, error) {
 	encodings := map[string]string{
 		"A": ".-",
 		"B": "-...",
@@ -38,26 +38,26 @@ func NewMorseTree() (*TREE, error) {
 		"Y": "-.--",
 		"Z": "--..",
 	}
-	tree := NewTree()
+	bst := NewTree()
 	for char, morse := range encodings {
-			if err := tree.Insert(morse, char); err!= nil {
+			if err := bst.Insert(morse, char); err!= nil {
 					return nil, err
 			}
 	}
 
-	return tree, nil
+	return bst, nil
 }
 
-func (tree *TREE) checkMorse(morse string) errpr {
+func (bst *BST) checkMorse(morse string) error {
 		if len(strings.ReplaceAll(strings.ReplaceAll(morse, ".", ""), "-", "")) > 0 {
 				return errors.New("Morse strings can only contain di and dah characters!")
 	}
 
-	return nil
+	return ""
 }
 
-func (tree *TREE) Decode(morse string) string {
-		if err := tree.checkMorse(morse); err != nil {
+func (bst *BST) Decode(morse string) string {
+		if err := bst.checkMorse(morse); err != nil {
 				log.Println(err)
 				return ""
 		}
@@ -66,7 +66,7 @@ func (tree *TREE) Decode(morse string) string {
 
 		switch {
 		case morse[0:1] == ".":
-			r, err := tree.decode(morse[1:], tree.Root.Dash)
+			r, err := bst.decode(morse[1:], bst.Root.Dash)
 			if err != nil {
 					log.Printf("%s (%s), using '_' as placeholder\n", err, morse)
 					return "_"
@@ -77,7 +77,7 @@ func (tree *TREE) Decode(morse string) string {
 		return result
 }
 
-func (tree *TREE) decode(morse string, currentNode *Node) (string, error) {
+func (bst *BST) decode(morse string, currentNode *Node) (string, error) {
 		if len(morse) == 0 {
 				result := currentNode.Char
 				return result, nil
@@ -85,33 +85,33 @@ func (tree *TREE) decode(morse string, currentNode *Node) (string, error) {
 
 		if morse[0:1] == "." {
 				if currentNode.Dot != nil {
-						return tree.decode(morse[1:], currentNode.Dot)
+					return bst.decode(morse[1:], currentNode.Dot), nil
 				}
 		}
 
 		if morse[0:1] == "-" {
 			dash := currentNode.Dash
 			if dash != nil {
-					return tree.decode(morse[1:], dash)
+				return bst.decode(morse[1:], dash), nil
 				}
 		}
 
-		return "", errors.New("Morse pattern not found!")
+		return "", errors.New("morse pattern not found")
 }
 
-func (tree* TREE) Insert(morse string, char string) error {
-		if err := tree.checkMorse(morse); err != nil {
+func (bst* BST) Insert(morse string, char string) error {
+		if err := bst.checkMorse(morse); err != nil {
 				return err
 		}
 
-		root := tree.Root
+		root := bst.Root
 
 		if morse[0:1] == "." {
 				if root.Dot == nil {
 						root.Dot = &Node{}
 				}
 
-				return tree.insert(morse[1:], char, root.Dot)
+				return bst.insert(morse[1:], char, root.Dot)
 		}
 
 		if morse[0:1] == "-" {
@@ -119,13 +119,13 @@ func (tree* TREE) Insert(morse string, char string) error {
 						root.Dash = &Node{}
 				}
 
-				return tree.insert(morse[1:], char, root.Dash)
+				return bst.insert(morse[1:], char, root.Dash)
 		}
 
 		return nil
 }
 
-func (tree *TREE) insert(morse, char string, currentNode *Node) error {
+func (bst *BST) insert(morse, char string, currentNode *Node) error {
 		if len(morse) == 0 {
 			currentNode.Char = char
 			return nil
@@ -136,7 +136,7 @@ func (tree *TREE) insert(morse, char string, currentNode *Node) error {
 						currentNode.Dot = &Node{}
 				}
 
-				return tree.insert(morse[1:], char, currentNode.Dot)
+				return bst.insert(morse[1:], char, currentNode.Dot)
 		}
 
 		if morse[0:1] == "-" {
@@ -144,13 +144,13 @@ func (tree *TREE) insert(morse, char string, currentNode *Node) error {
 					currentNode.Dash = &Node{}
 				}
 
-				return tree.insert(morse[1:], char, currentNode.Dash)
+				return bst.insert(morse[1:], char, currentNode.Dash)
 		}
 
 		return nil
 }
-func NewTree() *TREE {
-		tree := new(TREE)
-		tree.Root = NewNode("", "")
-		return tree
+func NewTree() *BST {
+		bst := new(BST)
+		bst.Root = NewNode("", "")
+		return bst
 }
