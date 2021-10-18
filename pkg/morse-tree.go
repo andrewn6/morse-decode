@@ -51,9 +51,9 @@ func NewMorseTree() (*BST, error) {
 func (bst *BST) checkMorse(morse string) error {
 		if len(strings.ReplaceAll(strings.ReplaceAll(morse, ".", ""), "-", "")) > 0 {
 				return errors.New("Morse strings can only contain di and dah characters!")
-	}
+		}
 
-	return ""
+		return nil
 }
 
 func (bst *BST) Decode(morse string) string {
